@@ -1,11 +1,14 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useRef } from "react";
 import { useState, useEffect } from "react";
+import axios from "axios";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const CRUD = () => {
   const words = [
@@ -22,6 +25,7 @@ const CRUD = () => {
   ];
 
   const [data, setData] = useState([]);
+  const dataArrayRef = useRef(data);
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
@@ -32,23 +36,103 @@ const CRUD = () => {
 
   const [editWord, setEditWord] = useState("");
   const [editTranslate, setEditTranslate] = useState("");
+  const [editId, setEditId] = useState("");
 
   useEffect(() => {
-    setData(words);
-  }, []);
+    getData();
+    console.log("ok");
+    dataArrayRef.current = data;
+  }, [dataArrayRef]);
 
   const handleEdit = (id) => {
     handleShow();
+    axios
+      .get(`https://localhost:7281/api/Word/${id}`)
+      .then((result) => {
+        setEditWord(result.data.text);
+        setEditTranslate(result.data.translate);
+        setEditId(result.data.id);
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
   };
 
   const handleDelete = (id) => {
-    if (window.confirm("Are you shure delete this word")) alert(id);
+    if (window.confirm("Are you shure delete this word")) {
+      axios
+        .delete(`https://localhost:7281/api/Word/${id}`)
+        .then((result) => {
+          if (result.status === 200) {
+            getData();
+            toast.success("Word has been deleted!");
+          }
+        })
+        .catch((error) => {
+          toast.error(error);
+        });
+    }
   };
 
-  const handleUpdate = () => {};
+  const handleAdd = () => {
+    const url = "https://localhost:7281/api/Word";
+    const data = {
+      text: word,
+      translate: translate,
+    };
+    axios
+      .post(url, data)
+      .then((result) => {
+        getData();
+        clear();
+        toast.success("Word has been added!");
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
+  };
+
+  const getData = () => {
+    axios
+      .get("https://localhost:7281/api/Word")
+      .then((result) => {
+        setData(result.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const clear = () => {
+    setWord("");
+    setTranslate("");
+    setEditWord("");
+    setEditTranslate("");
+    setEditId("");
+  };
+  const handleUpdate = () => {
+    const url = `https://localhost:7281/api/Word/${editId}`;
+    const data = {
+      id: editId,
+      text: editWord,
+      translate: editTranslate,
+    };
+    axios
+      .put(url, data)
+      
+      .then((result) => {
+        handleClose()
+        getData();
+        toast.success("Word has been changed!");
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
+  };
 
   return (
     <Fragment>
+      <ToastContainer />
       <Container style={{ margin: "30px" }}>
         <Row md={4}>
           <Col>
@@ -70,7 +154,9 @@ const CRUD = () => {
             ></input>
           </Col>
           <Col>
-            <Button variant="success">Submit</Button>
+            <Button variant="success" onClick={() => handleAdd()}>
+              Submit
+            </Button>
           </Col>
         </Row>
       </Container>
@@ -143,7 +229,7 @@ const CRUD = () => {
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" onClick={handleUpdate}>
+          <Button variant="primary" onClick={() => handleUpdate()}>
             Save Changes
           </Button>
         </Modal.Footer>
