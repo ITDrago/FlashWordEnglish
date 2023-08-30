@@ -74,3 +74,8 @@ C:\Users\cimon\Desktop\FlashWordEnglish\serverWebAPI\WebAPI\WebAPI\obj\Debug\net
 C:\Users\cimon\Desktop\FlashWordEnglish\serverWebAPI\WebAPI\WebAPI\obj\Debug\net7.0\WebAPI.pdb
 C:\Users\cimon\Desktop\FlashWordEnglish\serverWebAPI\WebAPI\WebAPI\obj\Debug\net7.0\WebAPI.genruntimeconfig.cache
 C:\Users\cimon\Desktop\FlashWordEnglish\serverWebAPI\WebAPI\WebAPI\obj\Debug\net7.0\ref\WebAPI.dll
+C:\Users\cimon\Desktop\FlashWordEnglish\serverWebAPI\WebAPI\WebAPI\bin\Debug\net7.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\cimon\Desktop\FlashWordEnglish\serverWebAPI\WebAPI\WebAPI\bin\Debug\net7.0\BCrypt.Net-Next.dll
+C:\Users\cimon\Desktop\FlashWordEnglish\serverWebAPI\WebAPI\WebAPI\bin\Debug\net7.0\Scrutor.dll
+C:\Users\cimon\Desktop\FlashWordEnglish\serverWebAPI\WebAPI\WebAPI\bin\Debug\net7.0\Swashbuckle.AspNetCore.Filters.dll
+C:\Users\cimon\Desktop\FlashWordEnglish\serverWebAPI\WebAPI\WebAPI\bin\Debug\net7.0\Swashbuckle.AspNetCore.Filters.Abstractions.dll

@@ -7,5 +7,7 @@ namespace WebAPI.Data
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
         public DbSet<Word> Words { get; set; }
+        public DbSet<User> Users { get; set; }
+
     }
 }

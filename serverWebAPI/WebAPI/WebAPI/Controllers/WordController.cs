@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using WebAPI.Data;
 using WebAPI.Model;
 
@@ -8,6 +10,8 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class WordController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -22,9 +26,10 @@ namespace WebAPI.Controllers
         {
             if (_context.Words == null)
                 return NotFound();
-            return await _context.Words.ToListAsync();
+            var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            return await _context.Words.Where(word => word.User.Email == userEmail).ToListAsync();
         }
-
+            
         [HttpGet("{id}")]
         public async Task <ActionResult<Word>> GetWord(int id)
         {
@@ -38,9 +43,18 @@ namespace WebAPI.Controllers
 
         public async Task <ActionResult<Word>> PostWord(Word word)
         {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim != null)
+            {
+                int userId = Convert.ToInt32(userIdClaim);
+                word.UserID = userId;
+            }
+
+            /*          word.User = null;*/ // Установка свойства User в null
+
             _context.Words.Add(word);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetWord), new { id = word.ID }, word);
+            await _context.SaveChangesAsync();  
+            return CreatedAtAction(nameof(GetWord), new { id = word.ID}, word);
         }
 
       

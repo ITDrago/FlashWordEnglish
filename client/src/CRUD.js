@@ -9,6 +9,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Spinner from "react-bootstrap/Spinner";
 
 const CRUD = () => {
   const words = [
@@ -40,7 +41,6 @@ const CRUD = () => {
 
   useEffect(() => {
     getData();
-    console.log("ok");
     dataArrayRef.current = data;
   }, [dataArrayRef]);
 
@@ -119,9 +119,9 @@ const CRUD = () => {
     };
     axios
       .put(url, data)
-      
+
       .then((result) => {
-        handleClose()
+        handleClose();
         getData();
         toast.success("Word has been changed!");
       })
@@ -196,9 +196,10 @@ const CRUD = () => {
                   </tr>
                 );
               })
-            : "Loading..."}
+            : <Spinner style={{margin:10}} animation="border" variant="primary" />}
         </tbody>
       </Table>
+
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Edit word</Modal.Title>
