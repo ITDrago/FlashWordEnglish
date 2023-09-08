@@ -10,6 +10,7 @@ import Col from "react-bootstrap/Col";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Spinner from "react-bootstrap/Spinner";
+import jwtDecode from "jwt-decode";
 
 const CRUD = () => {
   const words = [
@@ -39,6 +40,8 @@ const CRUD = () => {
   const [editTranslate, setEditTranslate] = useState("");
   const [editId, setEditId] = useState("");
 
+  const bearer = `Bearer ${localStorage.getItem("token")}`;
+
   useEffect(() => {
     getData();
     dataArrayRef.current = data;
@@ -47,7 +50,11 @@ const CRUD = () => {
   const handleEdit = (id) => {
     handleShow();
     axios
-      .get(`https://localhost:7281/api/Word/${id}`)
+      .get(`https://localhost:7281/api/Word/${id}`, {
+        headers: {
+          Authorization: bearer,
+        },
+      })
       .then((result) => {
         setEditWord(result.data.text);
         setEditTranslate(result.data.translate);
@@ -61,7 +68,11 @@ const CRUD = () => {
   const handleDelete = (id) => {
     if (window.confirm("Are you shure delete this word")) {
       axios
-        .delete(`https://localhost:7281/api/Word/${id}`)
+        .delete(`https://localhost:7281/api/Word/${id}`, {
+          headers: {
+            Authorization: bearer,
+          },
+        })
         .then((result) => {
           if (result.status === 200) {
             getData();
@@ -80,8 +91,14 @@ const CRUD = () => {
       text: word,
       translate: translate,
     };
+    const config = {
+      headers: {
+        Authorization: bearer,
+      },
+    };
+
     axios
-      .post(url, data)
+      .post(url, data, config)
       .then((result) => {
         getData();
         clear();
@@ -94,7 +111,11 @@ const CRUD = () => {
 
   const getData = () => {
     axios
-      .get("https://localhost:7281/api/Word")
+      .get(`https://localhost:7281/api/Word`, {
+        headers: {
+          Authorization: bearer,
+        },
+      })
       .then((result) => {
         setData(result.data);
       })
@@ -112,13 +133,22 @@ const CRUD = () => {
   };
   const handleUpdate = () => {
     const url = `https://localhost:7281/api/Word/${editId}`;
+    const decodedToken = JSON.parse(atob(localStorage.getItem("token").split(".")[1]));
+    const editUserId = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
     const data = {
       id: editId,
       text: editWord,
       translate: editTranslate,
+      userId :  editUserId
     };
+    const config = {
+      headers: {
+        Authorization: bearer,
+      },
+    };
+
     axios
-      .put(url, data)
+      .put(url, data, config)
 
       .then((result) => {
         handleClose();
@@ -170,33 +200,39 @@ const CRUD = () => {
           </tr>
         </thead>
         <tbody>
-          {data && data.length > 0
-            ? data.map((item, index) => {
-                return (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{item.text}</td>
-                    <td>{item.translate}</td>
-                    <td colSpan={2}>
-                      <Button
-                        variant="primary"
-                        onClick={() => handleEdit(item.id)}
-                      >
-                        Edit
-                      </Button>{" "}
-                      &nbsp;
-                      <Button
-                        variant="danger"
-                        onClick={() => handleDelete(item.id)}
-                      >
-                        Delete
-                      </Button>{" "}
-                      &nbsp;
-                    </td>
-                  </tr>
-                );
-              })
-            : <Spinner style={{margin:10}} animation="border" variant="primary" />}
+          {data && data.length > 0 ? (
+            data.map((item, index) => {
+              return (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>{item.text}</td>
+                  <td>{item.translate}</td>
+                  <td colSpan={2}>
+                    <Button
+                      variant="primary"
+                      onClick={() => handleEdit(item.id)}
+                    >
+                      Edit
+                    </Button>{" "}
+                    &nbsp;
+                    <Button
+                      variant="danger"
+                      onClick={() => handleDelete(item.id)}
+                    >
+                      Delete
+                    </Button>{" "}
+                    &nbsp;
+                  </td>
+                </tr>
+              );
+            })
+          ) : (
+            <Spinner
+              style={{ margin: 10 }}
+              animation="border"
+              variant="primary"
+            />
+          )}
         </tbody>
       </Table>
 
