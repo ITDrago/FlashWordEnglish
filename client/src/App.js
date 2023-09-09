@@ -1,6 +1,6 @@
 import "./App.css";
 import CRUD from "./CRUD";
-import { NavLink, Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { NavLink, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
@@ -10,29 +10,25 @@ import Navbar from "react-bootstrap/Navbar";
 import Register from "./pages/Register";
 
 function App() {
-  const [isAuticated, setIsAuticated] = useState(false);
-  const [email, setEmail] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isPageVisible, setIsPageVisible] = useState(true);
+  const [shouldAnimate, setShouldAnimate] = useState(false);
 
   function logOut() {
-    setIsAuticated(false);
+    setIsAuthenticated(false);
     localStorage.removeItem("token");
-    setEmail("");
-  }
-
-  let linkComponent;
-  {
-    isAuticated
-      ? (linkComponent = <Navigate to="/crud" />)
-      : (linkComponent = (
-          <Login setIsAuticated={setIsAuticated} setEmail={setEmail} />
-        ));
+    localStorage.removeItem("email");
   }
 
   useEffect(() => {
     if (localStorage.getItem("token") != null) {
-      setIsAuticated(true);
-      // setDecodedToken(jwt.decode(localStorage.getItem("token")));
+      setIsAuthenticated(true);
     }
+    const timeout = setTimeout(() => {
+      setIsPageVisible(true);
+      setShouldAnimate(false)
+    }, 300); // Задержка в миллисекундах, здесь 300 мс (0.3 секунды)
+    return () => clearTimeout(timeout);
   }, []);
 
   return (
@@ -43,7 +39,7 @@ function App() {
         className="bg-body-tertiary"
       >
         <Container fluid>
-          <Navbar.Brand href="#">FlashWordEnglish</Navbar.Brand>
+          <Navbar.Brand href="#">Flash Word English</Navbar.Brand>
           <Navbar.Toggle aria-controls="navbarScroll" />
           <Navbar.Collapse id="navbarScroll">
             <Nav
@@ -52,20 +48,29 @@ function App() {
               navbarScroll
             >
               <Nav.Link href="#action1">Home</Nav.Link>
-              <Nav.Link href="#action2">Word</Nav.Link>
-              <Nav.Link href="#">Training</Nav.Link>
-              {isAuticated ? (
+              {isAuthenticated ? (
+                <Nav.Link href="/crud">Word</Nav.Link>
+              ) : (
+                <Nav.Link href="/login">Word</Nav.Link>
+              )}
+              {isAuthenticated ? (
+                <Nav.Link href="#acrion2">Training</Nav.Link>
+              ) : (
+                <Nav.Link href="/login">Training</Nav.Link>
+              )}
+              {isAuthenticated ? (
                 ""
               ) : (
                 <Nav.Link href="/register">Register</Nav.Link>
               )}
+              {isAuthenticated ? "" : <Nav.Link href="/login">Login</Nav.Link>}
             </Nav>
             <Form className="d-flex">
-              {isAuticated ? (
+              {isAuthenticated ? (
                 <div style={{ display: "flex", justifyContent: "center" }}>
                   <Form.Control
                     type="text"
-                    value={email}
+                    value={localStorage.getItem("email")}
                     className="me-2"
                     aria-label="Search"
                     readOnly
@@ -73,7 +78,10 @@ function App() {
                   <NavLink
                     to="/login"
                     className="btn btn-outline-danger"
-                    onClick={logOut}
+                    onClick={() =>{
+                      logOut()
+                      setShouldAnimate(false);
+                    }}
                   >
                     Logout
                   </NavLink>
@@ -86,18 +94,32 @@ function App() {
         </Container>
       </Navbar>
       <Routes>
-        <Route path="/crud" element={<CRUD />} />
-        <Route path="/register" element={<AuthRoutes />} />
-        <Route path="/*" element={<Navigate to="/Login" />} />
+        <Route
+          path="/crud"
+          element={
+            <div className={shouldAnimate  ? "slide-in" : ""}>
+              <CRUD />
+            </div>  
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <div className={isPageVisible ? "slide-in" : "slide-out"}>
+              <Login setIsAuthenticated={setIsAuthenticated}/>
+            </div>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <div className={isPageVisible ? "slide-in" : "slide-out"}>
+              <Register />
+            </div>
+          }
+        />
+        <Route path="/*" element={<Navigate to="/login" />} />
       </Routes>
-      {linkComponent}
-    </div>
-  );
-}
-function AuthRoutes() {
-  return (
-    <div>
-      <Register />
     </div>
   );
 }

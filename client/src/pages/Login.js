@@ -1,20 +1,21 @@
 import axios from "axios";
 import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
-const Login = ({ setIsAuticated, setEmail}) => {
+const Login = ({ setIsAuthenticated }) => {
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
 
+  const navigate = useNavigate();
+
   async function handelLogin(e) {
     e.preventDefault();
-    getToken().then(() => {
-  
-      setEmail(userEmail)
-      
-      console.log(userEmail, userPassword);
-      console.log(localStorage.getItem("token"));
+    getToken().then((token) => {
+      if (token) {
+        localStorage.setItem("email", userEmail);
+        navigate("/crud");
+      }
     });
   }
 
@@ -30,7 +31,7 @@ const Login = ({ setIsAuticated, setEmail}) => {
 
       const token = response.data;
       localStorage.setItem("token", token);
-      setIsAuticated(true);
+      setIsAuthenticated(true);
       return token;
     } catch (error) {
       console.log(error);
