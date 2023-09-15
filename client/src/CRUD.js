@@ -133,13 +133,18 @@ const CRUD = () => {
   };
   const handleUpdate = () => {
     const url = `https://localhost:7281/api/Word/${editId}`;
-    const decodedToken = JSON.parse(atob(localStorage.getItem("token").split(".")[1]));
-    const editUserId = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+    const decodedToken = JSON.parse(
+      atob(localStorage.getItem("token").split(".")[1])
+    );
+    const editUserId =
+      decodedToken[
+        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+      ];
     const data = {
       id: editId,
       text: editWord,
       translate: editTranslate,
-      userId :  editUserId
+      userId: editUserId,
     };
     const config = {
       headers: {
@@ -162,7 +167,6 @@ const CRUD = () => {
 
   return (
     <Fragment>
-      <ToastContainer />
       <Container style={{ margin: "30px" }}>
         <Row md={4}>
           <Col>

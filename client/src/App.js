@@ -26,7 +26,7 @@ function App() {
     }
     const timeout = setTimeout(() => {
       setIsPageVisible(true);
-      setShouldAnimate(false)
+      setShouldAnimate(false);
     }, 300); // Задержка в миллисекундах, здесь 300 мс (0.3 секунды)
     return () => clearTimeout(timeout);
   }, []);
@@ -49,21 +49,35 @@ function App() {
             >
               <Nav.Link href="#action1">Home</Nav.Link>
               {isAuthenticated ? (
-                <Nav.Link href="/crud">Word</Nav.Link>
+                <Nav.Link as={NavLink} to="/crud">
+                  Word
+                </Nav.Link>
               ) : (
-                <Nav.Link href="/login">Word</Nav.Link>
+                <Nav.Link as={NavLink} to="/login">
+                  Word
+                </Nav.Link>
               )}
               {isAuthenticated ? (
                 <Nav.Link href="#acrion2">Training</Nav.Link>
               ) : (
-                <Nav.Link href="/login">Training</Nav.Link>
+                <Nav.Link as={NavLink} to="/login">
+                  Training
+                </Nav.Link>
               )}
               {isAuthenticated ? (
                 ""
               ) : (
-                <Nav.Link href="/register">Register</Nav.Link>
+                <Nav.Link as={NavLink} to="/register">
+                  Register
+                </Nav.Link>
               )}
-              {isAuthenticated ? "" : <Nav.Link href="/login">Login</Nav.Link>}
+              {isAuthenticated ? (
+                ""
+              ) : (
+                <Nav.Link as={NavLink} to="/login">
+                  Login
+                </Nav.Link>
+              )}
             </Nav>
             <Form className="d-flex">
               {isAuthenticated ? (
@@ -78,8 +92,8 @@ function App() {
                   <NavLink
                     to="/login"
                     className="btn btn-outline-danger"
-                    onClick={() =>{
-                      logOut()
+                    onClick={() => {
+                      logOut();
                       setShouldAnimate(false);
                     }}
                   >
@@ -97,16 +111,16 @@ function App() {
         <Route
           path="/crud"
           element={
-            <div className={shouldAnimate  ? "slide-in" : ""}>
+            <div className={shouldAnimate ? "slide-in" : ""}>
               <CRUD />
-            </div>  
+            </div>
           }
         />
         <Route
           path="/login"
           element={
             <div className={isPageVisible ? "slide-in" : "slide-out"}>
-              <Login setIsAuthenticated={setIsAuthenticated}/>
+              <Login setIsAuthenticated={setIsAuthenticated} />
             </div>
           }
         />
